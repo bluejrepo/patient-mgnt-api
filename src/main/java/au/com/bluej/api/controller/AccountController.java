@@ -20,7 +20,7 @@ import jakarta.validation.Valid;
 
 
 @RestController
-public class AccountController implements AccountManagementService{
+public class AccountController extends APIController implements AccountManagementService{
 
 	/**
 	ServletConfig:
