@@ -8,7 +8,6 @@ import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Patient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import au.gov.adha.api.service.PatientFhirService;
 import ca.uhn.fhir.rest.annotation.Create;
 import ca.uhn.fhir.rest.annotation.IdParam;
@@ -26,6 +25,10 @@ public class PatientResourceProvider implements IResourceProvider {
  
 	@Autowired
 	PatientFhirService patientFhirService;
+	
+	//@Autowired
+	//FhirAsyncProcessor fhirAsyncProcessor;
+	
 	
     @Override
     public Class<Patient> getResourceType() {
@@ -64,7 +67,11 @@ public class PatientResourceProvider implements IResourceProvider {
         // Convert it to its standard 36-character string representation
         String guidString = uuid.toString();
         patient.setId(guidString);
+        //Hand off immediately to the background thread
+        patientFhirService.heavyProcessing(patient);
+        
         patientFhirService.saveOrUpdatePatient(patient);
+         
         MethodOutcome outcome = new MethodOutcome();
         outcome.setResource(patient);
         return outcome;
