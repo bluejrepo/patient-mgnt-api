@@ -5,6 +5,7 @@ import org.hl7.fhir.r4.model.Patient;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,6 +19,19 @@ public class PatientFhirService {
     // Simulating a backend FHIR repository or data store
     private final Map<String, Patient> patientRepository = new ConcurrentHashMap<>();
 
+    @Async("fhirAsyncExecutor") //Tells Spring to process this on a background thread
+    public void heavyProcessing(Patient patient) {
+    	try {
+			Thread.sleep(3000);
+			// Perform long-running operations (database indexing, vendor sync, etc.)
+	        System.out.println("Processing patient on thread: " + Thread.currentThread().getName());
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
+    
     @Cacheable(value = "fhirPatients", key = "#id")
     public Patient getPatientById(String id) {
         System.out.println("Fetching patient from FHIR database for ID: " + id);
